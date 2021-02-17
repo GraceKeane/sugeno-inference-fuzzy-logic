@@ -1,0 +1,42 @@
+FUNCTION_BLOCK getDappingLevel
+
+	VAR_INPUT
+		wind : REAL;
+		temperature : REAL;
+	END_VAR
+	
+	VAR_OUTPUT
+		dapping : REAL;
+	END_VAR
+
+	FUZZIFY wind
+ 		TERM calm := (0, 1) (2, 1) (6, 0);
+ 		TERM fresh := trian 3 6 9;
+ 		TERM stormy := (6, 0) (10, 1) (12, 1);
+	END_FUZZIFY
+	
+	FUZZIFY temperature
+ 		TERM low := trian 1 6 12;
+ 		TERM average := trian 6 12 18;
+ 		TERM high := (12, 0) (17, 1) (18, 1);
+	END_FUZZIFY
+
+	DEFUZZIFY dapping //Method body....
+ 		TERM poor := 25;
+ 		TERM mediocre := 50;
+ 		TERM excellent := 75;
+ 		METHOD : COGS;
+ 		DEFAULT := 5;
+	END_DEFUZZIFY
+
+	RULEBLOCK No1
+	 	AND : MIN;
+	 	ACT : MIN;
+	 	ACCU : MAX;
+	 	RULE 1 : IF wind IS stormy OR temperature IS low THEN dapping IS poor;
+		RULE 2 : IF wind IS fresh AND temperature IS average THEN dapping IS mediocre;
+		RULE 3 : IF wind IS stormy OR temperature IS NOT low THEN dapping IS excellent;
+		RULE 4 : IF wind IS calm AND temperature IS NOT average THEN dapping IS poor;
+	END_RULEBLOCK
+	
+END_FUNCTION_BLOCK
